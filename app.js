@@ -10,7 +10,7 @@ app.get('/', (req, res) => {
 // Динамическое приветствие
 app.get('/hello', (req, res) => {
     const name = req.query.name || 'World'; // Если имя не указано, используем "World"
-    res.send(`Hello, ${name}`);
+    res.send(`Not Hello, ${name}`);
 });
 
 // Запуск сервера
