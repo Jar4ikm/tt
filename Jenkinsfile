@@ -10,7 +10,6 @@ pipeline {
         stage('File') {
             steps {
                 sh docker build -t myapp .
-            }
         }
     }
 }
