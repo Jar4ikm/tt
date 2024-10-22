@@ -7,9 +7,10 @@ pipeline {
                 echo 'Hello World'
             }
         }
-        stage('File') {
+        stage('Build') {
             steps {
-                sh docker build -t myapp .
+                sh 'docker build -t myapp .'
+            }
         }
     }
 }
