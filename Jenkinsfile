@@ -9,7 +9,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh 'docker build -t myapp .'
+                sh 'sudo docker build -t myapp .'
             }
         }
     }
