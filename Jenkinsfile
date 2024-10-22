@@ -9,9 +9,7 @@ pipeline {
         }
         stage('File') {
             steps {
-                sh "touch file.txt"
-                sh "echo 'hEllo' >> file.txt"
-                sh "cat file.txt"
+                sh docker build -t myapp .
             }
         }
     }
