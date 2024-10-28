@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials') // Jenkins credentials ID
-        DOCKER_IMAGE = 'jar4ik/apap' // Replace with your actual repository name
+        DOCKER_HUB_CREDENTIALS = credentials("docker-hub-credentials") // Jenkins credentials ID
+        DOCKER_IMAGE = "jar4ik/apap" // Replace with your actual repository name
         DOCKER_TAG = "latest"
     }
 
