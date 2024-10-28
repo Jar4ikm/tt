@@ -1,19 +1,13 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB_CREDENTIALS = credentials("docker-hub-credentials") // Jenkins credentials ID
-        DOCKER_IMAGE = "jar4ik/apap" // Replace with your actual repository name
-        DOCKER_TAG = "latest"
-    }
-
     stages {
         stage('Build Docker Image') {
             steps {
                 script {
                     echo 'Building Docker image...'
                     // Using docker.withRegistry to manage authentication and context
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                    docker.withRegistry('https://registry.hub.docker.com', docker-hub-credential) {
                         def customImage = docker.build("jar4ik/apap:latest") // Build the image with the unique build ID
                     }
                 }
@@ -40,7 +34,7 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing Docker image to Docker Hub...'
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                    docker.withRegistry('https://registry.hub.docker.com', docker-hub-credential) {
                         def customImage = docker.image("jar4ik/apap:latest")
                         customImage.push() // Push the built image to the registry
                     }
