@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
-        DOCKER_IMAGE = 'jar4ik/apapap' // Замените "username/my-app" на ваше имя репозитория в Docker Hub
+        DOCKER_IMAGE = 'jar4ik/apap' // Замените на реальное имя вашего репозитория
         DOCKER_TAG = "latest"
     }
 
@@ -12,7 +12,6 @@ pipeline {
             steps {
                 script {
                     echo 'Building Docker image...'
-                    // Собираем Docker-образ из Dockerfile в корне проекта
                     sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
                 }
             }
@@ -22,7 +21,6 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    // Запускаем контейнер и тесты внутри него
                     sh 'docker run --rm $DOCKER_IMAGE:$DOCKER_TAG npm test'
                 }
             }
@@ -35,9 +33,7 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing Docker image to Docker Hub...'
-                    // Логинимся на Docker Hub
                     sh "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    // Отправляем образ на Docker Hub
                     sh "docker push $DOCKER_IMAGE:$DOCKER_TAG"
                 }
             }
@@ -47,9 +43,10 @@ pipeline {
     post {
         always {
             script {
+                def image = "${DOCKER_IMAGE}"
+                def tag = "${DOCKER_TAG}"
                 echo 'Cleaning up...'
-                // Удаляем локальные образы для освобождения места
-                sh "docker rmi $DOCKER_IMAGE:$DOCKER_TAG || true"
+                sh "docker rmi ${image}:${tag} || true"
             }
         }
         failure {
