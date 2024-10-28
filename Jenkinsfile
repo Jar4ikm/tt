@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        //DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
-        DOCKER_IMAGE = 'jar4ik/apap' // Замените на реальное имя вашего репозитория
+        //DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials') // Jenkins credentials ID
+        DOCKER_IMAGE = 'jar4ik/apap' // Replace with your actual repository name
         DOCKER_TAG = "latest"
     }
 
@@ -11,10 +11,11 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "test"
-                    echo("${env.DOCKER_IMAGE}")
                     echo 'Building Docker image...'
-                    sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
+                    // Using docker.withRegistry to manage authentication and context
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                        def customImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}") // Build the image with the unique build ID
+                    }
                 }
             }
         }
@@ -23,7 +24,8 @@ pipeline {
             steps {
                 script {
                     echo 'Running tests...'
-                    sh 'docker run --rm $DOCKER_IMAGE:$DOCKER_TAG npm test'
+                    // Using the latest built image to run tests
+                    sh "docker run --rm ${DOCKER_IMAGE}:${env.BUILD_ID} npm test"
                 }
             }
         }
@@ -35,8 +37,10 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing Docker image to Docker Hub...'
-                    sh "echo $DOCKER_HUB_CREDENTIALS_PSW | docker login -u $DOCKER_HUB_CREDENTIALS_USR --password-stdin"
-                    sh "docker push $DOCKER_IMAGE:$DOCKER_TAG"
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
+                        def customImage = docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}")
+                        customImage.push() // Push the built image to the registry
+                    }
                 }
             }
         }
@@ -45,10 +49,9 @@ pipeline {
     post {
         always {
             script {
-                def image = "${DOCKER_IMAGE}"
-                def tag = "${DOCKER_TAG}"
                 echo 'Cleaning up...'
-                sh "docker rmi ${image}:${tag} || true"
+                // Clean up the images after the build
+                sh "docker rmi ${DOCKER_IMAGE}:${env.BUILD_ID} || true"
             }
         }
         failure {
