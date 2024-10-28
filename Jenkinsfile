@@ -7,7 +7,7 @@ pipeline {
                 script {
                     echo 'Building Docker image...'
                     // Using docker.withRegistry to manage authentication and context
-                    docker.withRegistry('https://registry.hub.docker.com', "docker-hub-credential") {
+                    docker.withRegistry('https://registry.hub.docker.com', "docker-hub-credentials") {
                         def customImage = docker.build("jar4ik/apap:latest") // Build the image with the unique build ID
                     }
                 }
@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing Docker image to Docker Hub...'
-                    docker.withRegistry('https://registry.hub.docker.com', "docker-hub-credential") {
+                    docker.withRegistry('https://registry.hub.docker.com', "docker-hub-credentials") {
                         def customImage = docker.image("jar4ik/apap:latest")
                         customImage.push() // Push the built image to the registry
                     }
