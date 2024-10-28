@@ -14,7 +14,7 @@ pipeline {
                     echo 'Building Docker image...'
                     // Using docker.withRegistry to manage authentication and context
                     docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
-                        def customImage = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}") // Build the image with the unique build ID
+                        def customImage = docker.build("jar4ik/apap:latest") // Build the image with the unique build ID
                     }
                 }
             }
@@ -27,7 +27,7 @@ pipeline {
                     // Wrap in node context for proper shell execution
                     node {
                         // Using the latest built image to run tests
-                        sh "docker run --rm ${DOCKER_IMAGE}:${env.BUILD_ID} npm test"
+                        sh "docker run --rm jar4ik/apap:latest npm test"
                     }
                 }
             }
@@ -41,7 +41,7 @@ pipeline {
                 script {
                     echo 'Pushing Docker image to Docker Hub...'
                     docker.withRegistry('https://registry.hub.docker.com', DOCKER_HUB_CREDENTIALS) {
-                        def customImage = docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}")
+                        def customImage = docker.image("jar4ik/apap:latest")
                         customImage.push() // Push the built image to the registry
                     }
                 }
@@ -56,7 +56,7 @@ pipeline {
                 // Clean up the images after the build
                 node {
                     // Clean up using a node context
-                    sh "docker rmi ${DOCKER_IMAGE}:${env.BUILD_ID} || true"
+                    sh "docker rmi jar4ik/apap:latest || true"
                 }
             }
         }
